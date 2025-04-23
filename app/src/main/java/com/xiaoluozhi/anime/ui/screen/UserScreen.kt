@@ -10,6 +10,6 @@ import androidx.compose.ui.Modifier
 @Composable
 fun UserScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("这是分类页面内容")
+        Text("这是用户页面内容")
     }
 }
