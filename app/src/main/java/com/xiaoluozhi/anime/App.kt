@@ -3,6 +3,7 @@ package com.xiaoluozhi.anime
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import androidx.compose.runtime.Composable
 import com.tencent.mmkv.MMKV
 
 class App : Application(){
@@ -19,4 +20,9 @@ class App : Application(){
         MMKV.initialize(this)
         kv = MMKV.mmkvWithID("kv", MMKV.MULTI_PROCESS_MODE)
     }
-} 
+}
+
+@Composable
+fun AppNavHost() {
+
+}

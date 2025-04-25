@@ -91,4 +91,6 @@ dependencies {
 
     // Jsoup工具库
     implementation(libs.jsoup)
+    // 骨架屏
+    implementation(libs.shimmer)
 }

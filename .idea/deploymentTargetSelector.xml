@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="androidapk.anime.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-04-23T16:49:40.039998500Z">
+        <DropdownSelection timestamp="2025-04-25T09:40:24.328197700Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="Default" identifier="serial=192.168.110.193:5555;connection=63d9930f" />
+              <DeviceId pluginId="Default" identifier="serial=192.168.110.70:5555;connection=7d82c08f" />
             </handle>
           </Target>
         </DropdownSelection>
