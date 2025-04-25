@@ -1,14 +1,17 @@
 package com.xiaoluozhi.anime.ui.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
@@ -20,11 +23,13 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,24 +49,101 @@ fun HomeScreen() {
     // 获取state
     val state = viewModel.state.collectAsState()
 
-    var scrollState = rememberScrollState()
-
     LaunchedEffect(Unit) {
         viewModel.sendIntent(HomeIntent.LoadingCarouse)
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(start = 10.dp, end = 10.dp)
-    ) {
-        PopularItems(
-            state.value.popularItems,
-            state.value.popularLoading,
-            state.value.popularLoadError
-        ) {
-            viewModel.sendIntent(HomeIntent.LoadingCarouse)
+            .padding(horizontal = 10.dp)
+    ) {  // --- PopularItems 部分 ---
+        item {
+            PopularItems(
+                state.value.popularItems,
+                state.value.popularLoading,
+                state.value.popularLoadError
+            ) {
+                viewModel.sendIntent(HomeIntent.LoadingCarouse)
+            }
+            // PopularItems 后面加间距
+            Spacer(modifier = Modifier.height(16.dp)) // 增加一点间距
+        }
+
+        // --- RecommendedList 部分 (整合到 LazyColumn) ---
+        // 1. "番剧推荐" 标题
+        item {
+            Text(
+                "番剧推荐",
+                style = MaterialTheme.typography.titleLarge,
+                // PopularItems 已经有左右边距，这里可能不需要再加 start padding
+                 modifier = Modifier.padding(start = 5.dp, top = 10.dp, end = 5.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp)) // 标题和网格之间的间距
+        }
+
+        // 2. 推荐列表项 - 网格布局 (每行3个)
+        val totalRecommendedItems = 100 // 假设总数，实际应来自 ViewModel
+        val itemsPerRow = 3
+        // 计算行数，(总数 + 每行数 - 1) / 每行数 是整数除法计算向上取整的常用方法
+        val rowCount = (totalRecommendedItems + itemsPerRow - 1) / itemsPerRow
+
+        items(count = rowCount, key = { rowIndex -> "row_$rowIndex" }) { rowIndex ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+
+                    .padding(vertical = 4.dp), // 每行之间的垂直间距
+                horizontalArrangement = Arrangement.spacedBy(8.dp) // 项目之间的水平间距
+            ) {
+                // 循环创建当前行的项目
+                for (colIndex in 0 until itemsPerRow) {
+                    val itemIndex = rowIndex * itemsPerRow + colIndex
+
+                    // 使用 Box 包裹并应用 weight，确保结构和对齐
+                    Box(modifier = Modifier.weight(1f)) {
+                        // 检查当前索引是否有效
+                        if (itemIndex < totalRecommendedItems) {
+                            // --- 这里放置你的实际列表项 UI ---
+                            // 例如，一个简单的 Card 或 Text
+                            Column( // 用 Column 包裹内容，方便扩展
+                                modifier = Modifier
+                                    .fillMaxWidth() // 填满 weight 分配的空间
+                                    // .background(MaterialTheme.colorScheme.surfaceVariant) // 加个背景看效果
+                                    .padding(4.dp) // 内容的内边距
+                            ) {
+
+                                Column {
+                                    AsyncImage(
+                                        modifier = Modifier
+                                            .height(180.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .fillMaxWidth(),
+                                        model = "https://img.cycimg.me/r/800/pic/cover/l/17/96/513089_EUq63.jpg",
+                                        contentScale = ContentScale.Crop,
+                                        contentDescription = "图片"
+                                    )
+                                    // 可以在这里放图片、文字等
+                                    Text(
+                                        text = "番剧 $itemIndex",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        maxLines = 1,
+                                        overflow = Ellipsis,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                                // ... 其他内容
+                            }
+                            // --- 实际列表项 UI 结束 ---
+                        } else {
+                            // 如果索引超出总数（最后一行不完整），
+                            // 则此 Box (已应用 weight) 保持空白，以维持布局
+                            Spacer(Modifier.fillMaxSize()) // 或者保持 Box 为空
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -75,7 +157,7 @@ fun PopularItems(
 ) {
     Column {
         Text(
-            "受欢迎的番剧",
+            "大家都在看",
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start = 5.dp)
         )
@@ -84,6 +166,7 @@ fun PopularItems(
                 HorizontalMultiBrowseCarousel(
                     state = rememberCarouselState { if (loading) 3 else items.count() },
                     modifier = Modifier
+                        .height(205.dp)
                         .padding(start = 5.dp, top = 10.dp, end = 5.dp)
                         .shimmer(loading),
                     preferredItemWidth = 260.dp,
@@ -158,11 +241,6 @@ fun PopularItems(
     }
 }
 
-@Composable
-fun RecommendedList() {
-
-}
-
 @Preview(showBackground = true, name = "页面") // 可以给 Preview 命名
 @Composable
 fun HomeScreenBarPreview() {
@@ -178,15 +256,6 @@ fun PopularItemsBarPreview() {
         PopularItems(listOf(), loading = true, loadError = false)
     }
 }
-
-@Preview(showBackground = true, name = "推荐列表") // 可以给 Preview 命名
-@Composable
-fun RecommendedListPreview() {
-    AnimeTheme {
-        RecommendedList()
-    }
-}
-
 
 // 纯色绘制生成器
 @Composable

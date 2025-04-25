@@ -15,15 +15,39 @@ data class CarouselItem(
     val detailUrl: String
 )
 
+// 番剧
+data class Anime(
+    // 番剧名
+    val name: String,
+    // 封面链接
+    val cover: String,
+    // 详情页链接
+    val detailUrl: String,
+    // 番剧标签
+    val tags: List<String>,
+    // 番剧简介
+    val intro: String,
+    // 番剧评分
+    val score: String,
+    // 番剧时间或集数
+    val remarks: String
+)
+
 data class HomeState(
     val popularItems: List<CarouselItem> = emptyList(),
     val popularLoading: Boolean = true,
-    val popularLoadError: Boolean = false
+    val popularLoadError: Boolean = false,
+
+    val animeList: List<Anime> = emptyList(),
+    val animeLoading: Boolean = true,
+    val animeLoadError: Boolean = false
 ) : BaseState
 
 sealed class HomeIntent : BaseIntent {
     // 获取轮播图列表
     data object LoadingCarouse : HomeIntent()
+    data object LoadingHomeAnime : HomeIntent()
+    data object LoadingMoreAnime : HomeIntent()
 }
 
 class HomeViewModel : BaseViewModel<HomeState, HomeIntent>() {
@@ -48,6 +72,14 @@ class HomeViewModel : BaseViewModel<HomeState, HomeIntent>() {
                     }
 
                 }
+            }
+
+            is HomeIntent.LoadingHomeAnime -> {
+
+            }
+
+            is HomeIntent.LoadingMoreAnime -> {
+
             }
         }
     }
