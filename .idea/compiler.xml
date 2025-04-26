@@ -4,6 +4,7 @@
     <bytecodeTargetLevel>
       <module name="androidapk.anime.app" target="21" />
       <module name="anime.app" target="21" />
+      <module name="anime.app~1" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>
